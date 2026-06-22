@@ -1,0 +1,79 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function role() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && role() == 'admin';
+    }
+
+    function isSpecialist() {
+      return isSignedIn() && role() == 'specialist';
+    }
+
+    function isParent() {
+      return isSignedIn() && role() == 'parent';
+    }
+
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() || request.auth.uid == userId;
+    }
+
+    match /children/{childId} {
+      allow read: if isAdmin() || isSpecialist() ||
+        (isParent() && resource.data.parentId == request.auth.uid);
+      allow write: if isAdmin() ||
+        (isParent() && request.resource.data.parentId == request.auth.uid);
+    }
+
+    match /modules/{moduleId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /lessons/{lessonId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /assignments/{assignmentId} {
+      allow read: if isAdmin() || isSpecialist() || isParent();
+      allow create: if isParent();
+      allow update: if isAdmin() || isSpecialist() ||
+        (isParent() && resource.data.parentVideoUrl == request.resource.data.parentVideoUrl);
+    }
+
+    match /diaryEntries/{entryId} {
+      allow read, write: if isAdmin() || isSpecialist() || isParent();
+    }
+
+    match /messages/{messageId} {
+      allow read, create: if isSignedIn() &&
+        (request.auth.uid == resource.data.senderId || request.auth.uid == resource.data.receiverId);
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow write: if isAdmin();
+    }
+
+    match /subscriptions/{subId} {
+      allow read: if isAdmin() || (isParent() && resource.data.parentId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    match /certificates/{certId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}
