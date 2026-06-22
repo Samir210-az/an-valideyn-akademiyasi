@@ -55,3 +55,4 @@ npm run dev
 
 ## Sənədlər
 - [Database arxitekturası](docs/database-architecture.md)
+- [Deployment təlimatı](docs/deployment.md)

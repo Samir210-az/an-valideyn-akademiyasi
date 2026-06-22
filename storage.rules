@@ -1,0 +1,30 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Tapşırıq videoları/şəkilləri — yalnız sahibi (valideyn) yükləyə bilər,
+    // daxil olmuş istifadəçilər oxuya bilər (mütəxəssis/admin nəzərdən keçirmə üçün)
+    match /assignments/{userId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == userId
+        && request.resource.size < 50 * 1024 * 1024; // max 50MB
+    }
+
+    // Dərs materialları (video/PDF) — yalnız admin/mütəxəssis yükləyə bilər
+    match /lessons/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn(); // Firestore-dakı rol yoxlaması ilə əlavə qorunmalıdır
+    }
+
+    // Profil şəkilləri
+    match /avatars/{userId}/{fileName} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn() && request.auth.uid == userId;
+    }
+  }
+}
