@@ -28,6 +28,23 @@ export async function submitAssignment(
   });
 }
 
+export async function getAllAssignments(): Promise<Assignment[]> {
+  if (!db) return [];
+  const snap = await getDocs(collection(db, "assignments"));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() } as Assignment));
+}
+
+export async function reviewAssignment(
+  assignmentId: string,
+  data: { specialistFeedback: string; score: number }
+) {
+  if (!db) return;
+  await updateDoc(doc(db, "assignments", assignmentId), {
+    ...data,
+    status: "reviewed",
+    reviewedAt: new Date().toISOString(),
+  });
+}
 export async function createAssignmentForLesson(lessonId: string, childId: string) {
   if (!db) throw new Error("Firebase konfiqurasiyası tamamlanmayıb.");
   const ref = doc(collection(db, "assignments"));
