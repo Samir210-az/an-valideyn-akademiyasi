@@ -14,9 +14,15 @@ interface DashboardShellProps {
 }
 
 const ACCENT_BG: Record<Accent, string> = {
-  admin: "bg-gradient-to-br from-slate-100 via-indigo-50/60 to-slate-100",
-  parent: "bg-gradient-to-br from-orange-50 via-rose-50/50 to-indigo-50/60",
-  specialist: "bg-gradient-to-br from-teal-50 via-emerald-50/50 to-indigo-50/50",
+  admin: "bg-slate-50",
+  parent: "bg-slate-50",
+  specialist: "bg-slate-50",
+};
+
+const ACCENT_BAR: Record<Accent, string> = {
+  admin: "bg-indigo-500",
+  parent: "bg-rose-400",
+  specialist: "bg-teal-500",
 };
 
 const ACCENT_HEADER: Record<Accent, string> = {
@@ -46,6 +52,7 @@ export function DashboardShell({ sidebar, title, children, accent = "admin" }: D
   return (
     <div className={`min-h-screen ${ACCENT_BG[accent]}`}>
       {/* Mobil üst panel */}
+      <div className={`h-1 w-full ${ACCENT_BAR[accent]} lg:hidden`} />
       <div className={`flex items-center justify-between border-b border-slate-200 px-4 py-3 backdrop-blur-sm lg:hidden ${ACCENT_HEADER[accent]}`}>
         <button
           onClick={() => setOpen(true)}
@@ -96,6 +103,7 @@ export function DashboardShell({ sidebar, title, children, accent = "admin" }: D
 
         {/* Əsas content — kənara çıxmasın deyə min-w-0 və overflow-hidden */}
         <div className="min-w-0 flex-1">
+          <div className={`h-1 w-full ${ACCENT_BAR[accent]} hidden lg:block`} />
           <div className="hidden items-center justify-end gap-2 border-b border-slate-200 bg-white/70 px-6 py-2 backdrop-blur-sm lg:flex">
             <NotificationBell />
           </div>
