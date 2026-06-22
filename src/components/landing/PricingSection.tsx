@@ -27,7 +27,7 @@ const plans = [
 
 export function PricingSection() {
   return (
-    <section className="bg-gradient-to-b from-white to-indigo-50 px-4 py-20 sm:py-28">
+    <section className="bg-gradient-to-b from-rose-50/60 to-indigo-100/60 px-4 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
         <Reveal className="mx-auto max-w-2xl text-center">
           <span className="text-sm font-semibold uppercase tracking-wide text-indigo-600">Planlar</span>

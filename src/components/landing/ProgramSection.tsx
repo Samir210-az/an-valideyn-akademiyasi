@@ -30,7 +30,7 @@ function ParallaxImage({ src, alt }: { src: string; alt: string }) {
 
 export function ProgramSection() {
   return (
-    <section id="proqram" className="relative overflow-hidden bg-gradient-to-b from-indigo-50 to-white px-4 py-20 sm:py-28">
+    <section id="proqram" className="relative overflow-hidden bg-gradient-to-b from-indigo-50 via-violet-50 to-orange-50 px-4 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
         <Reveal className="mx-auto max-w-2xl text-center">
           <span className="text-sm font-semibold uppercase tracking-wide text-indigo-600">Proqram</span>

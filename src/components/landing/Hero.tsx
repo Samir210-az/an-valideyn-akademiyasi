@@ -53,11 +53,20 @@ export function Hero() {
           AN Psixoloji Dəstək və Reabilitasiya Mərkəzi
         </motion.span>
 
+        <motion.h2
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.05 }}
+          className="text-2xl font-black tracking-tight text-amber-300 drop-shadow-sm sm:text-3xl"
+        >
+          AN Valideyn Akademiyası
+        </motion.h2>
+
         <motion.h1
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.1 }}
-          className="max-w-3xl text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl"
+          className="mt-3 max-w-3xl text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl md:text-5xl"
         >
           Övladınıza ən yaxşı dəstəyi —{" "}
           <span className="bg-gradient-to-r from-amber-300 via-pink-300 to-amber-300 bg-clip-text text-transparent">

@@ -40,7 +40,7 @@ const solutions = [
 
 export function ProblemSolution() {
   return (
-    <section className="bg-white px-4 py-20 sm:py-28">
+    <section className="bg-gradient-to-b from-orange-50 via-rose-50/60 to-indigo-50/70 px-4 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
         <Reveal className="mx-auto max-w-2xl text-center">
           <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">

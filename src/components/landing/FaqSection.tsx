@@ -31,7 +31,7 @@ export function FaqSection() {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section className="bg-white px-4 py-20 sm:py-28">
+    <section className="bg-gradient-to-b from-orange-50 to-rose-50/60 px-4 py-20 sm:py-28">
       <div className="mx-auto max-w-3xl">
         <Reveal className="text-center">
           <h2 className="text-3xl font-bold text-slate-900 sm:text-4xl">Tez-tez verilən suallar</h2>
