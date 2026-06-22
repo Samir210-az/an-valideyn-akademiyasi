@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { getChildrenByParent } from "@/lib/firestore/children";
 import { getDiaryEntries } from "@/lib/firestore/diary";
@@ -20,6 +21,9 @@ export default function ParentProgressPage() {
   const { appUser } = useAuth();
   const [child, setChild] = useState<Child | null>(null);
   const [entries, setEntries] = useState<DiaryEntry[]>([]);
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!appUser) return;
@@ -29,6 +33,27 @@ export default function ParentProgressPage() {
       if (first) getDiaryEntries(first.id).then((data) => setEntries(data.slice(0, 14).reverse()));
     });
   }, [appUser]);
+
+  async function handleGenerateSummary() {
+    if (!child) return;
+    setAiLoading(true);
+    setAiError(null);
+    setAiSummary(null);
+    try {
+      const res = await fetch("/api/ai/weekly-summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ childName: child.name, diaryEntries: entries }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Xəta baş verdi.");
+      setAiSummary(data.summary);
+    } catch (err) {
+      setAiError((err as Error).message);
+    } finally {
+      setAiLoading(false);
+    }
+  }
 
   if (!child) {
     return <p className="text-sm text-slate-500">Əvvəlcə Dashboard-dan uşaq profili əlavə edin.</p>;
@@ -64,6 +89,26 @@ export default function ParentProgressPage() {
               <Line type="monotone" dataKey="Tapşırıq icrası" stroke="#10b981" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
+        )}
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-medium text-slate-700">AI Həftəlik Xülasə</p>
+          <Button variant="outline" loading={aiLoading} onClick={handleGenerateSummary}>
+            Xülasə hazırla
+          </Button>
+        </div>
+        <p className="mt-2 text-xs text-slate-400">
+          AI yalnız sizin daxil etdiyiniz gündəlik qeydlərə əsaslanır və diaqnoz qoymur.
+        </p>
+        {aiError && (
+          <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{aiError}</p>
+        )}
+        {aiSummary && (
+          <p className="mt-3 whitespace-pre-line rounded-lg bg-indigo-50 px-3 py-2.5 text-sm text-indigo-800">
+            {aiSummary}
+          </p>
         )}
       </Card>
 
