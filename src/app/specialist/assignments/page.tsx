@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { HelpModal } from "@/components/shared/HelpModal";
 import { getAllAssignments, reviewAssignment } from "@/lib/firestore/assignments";
 import type { Assignment } from "@/types";
 
@@ -41,8 +42,27 @@ export default function SpecialistAssignmentsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Tapşırıqları yoxla</h1>
-      <p className="mt-1 text-sm text-slate-500">Valideynlər tərəfindən göndərilən tapşırıqlar</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Tapşırıqları yoxla</h1>
+          <p className="mt-1 text-sm text-slate-500">Valideynlər tərəfindən göndərilən tapşırıqlar</p>
+        </div>
+        <HelpModal title="Tapşırıqları necə qiymətləndirməli?">
+          <p>
+            "Yoxlanılmalı" siyahısında valideynin göndərdiyi video/şəkil/qeyd görünür. Bunlara
+            baxıb, <strong>rəy (yazılı feedback)</strong> və <strong>0-100 arası bal</strong> verin.
+          </p>
+          <p>
+            Rəy yazarkən konkret olun — valideyn bunu evdə necə davam etdirəcəyini bilməlidir.
+            Məsələn: "Göz təması məşqi yaxşı gedir, davam edin, indi 5 saniyəyə qədər artırmağa
+            çalışın."
+          </p>
+          <p className="text-xs text-slate-500">
+            "Göndər" basdıqdan sonra tapşırıq "Qiymətləndirildi" statusuna keçir və valideyn öz
+            panelində rəyi görəcək.
+          </p>
+        </HelpModal>
+      </div>
 
       <div className="mt-6 space-y-4">
         {submitted.length === 0 && (

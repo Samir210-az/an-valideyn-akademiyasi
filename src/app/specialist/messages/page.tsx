@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, FormEvent } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { HelpModal } from "@/components/shared/HelpModal";
 import { useAuth } from "@/context/AuthContext";
 import { getUsersByRole } from "@/lib/firestore/users";
 import { getConversation, sendMessage } from "@/lib/firestore/messages";
@@ -43,8 +44,22 @@ export default function SpecialistMessagesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Mesajlar</h1>
-      <p className="mt-1 text-sm text-slate-500">Valideynlərlə birbaşa ünsiyyət</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Mesajlar</h1>
+          <p className="mt-1 text-sm text-slate-500">Valideynlərlə birbaşa ünsiyyət</p>
+        </div>
+        <HelpModal title="Mesajlardan necə istifadə etməli?">
+          <p>
+            Soldan valideyni seçin, yazışma tarixçəsini görün, aşağıdan cavab yazın. Bunu tapşırıq
+            izahı, gündəlik qeydlə bağlı sual, ya da ümumi məsləhət üçün işlədin.
+          </p>
+          <p className="text-xs text-slate-500">
+            Tövsiyə: cavabları konkret və əməli saxlayın — valideyn bunu evdə dərhal tətbiq edə
+            bilməlidir.
+          </p>
+        </HelpModal>
+      </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-1">

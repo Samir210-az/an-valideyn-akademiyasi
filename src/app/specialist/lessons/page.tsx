@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { HelpModal } from "@/components/shared/HelpModal";
 import {
   getModules,
   getLessonsByModule,
@@ -59,10 +60,24 @@ export default function SpecialistLessonsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Dərs yaratma</h1>
-      <p className="mt-1 text-sm text-slate-500">
-        Mövcud modullara yeni dərs (video, PDF, məqalə) əlavə edin
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Dərs yaratma</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Mövcud modullara yeni dərs (video, PDF, məqalə) əlavə edin
+          </p>
+        </div>
+        <HelpModal title="Dərs necə əlavə olunur?">
+          <p>
+            Yuxarıdan modulu seçin, aşağıdaki formada dərs adı, (istəyə görə) video linki, PDF
+            linki və mətn izahını doldurub "Dərs əlavə et" basın.
+          </p>
+          <p>
+            Mətni sadə, valideynin başa düşəcəyi dildə yazın — texniki terminləri izah edin, qısa
+            paraqraflarla bölün. Bu, valideynin "Kurslar" bölməsində oxuyacağı materialdır.
+          </p>
+        </HelpModal>
+      </div>
 
       <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>

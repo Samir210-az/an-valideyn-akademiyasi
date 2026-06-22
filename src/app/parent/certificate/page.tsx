@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { HelpModal } from "@/components/shared/HelpModal";
 import { useAuth } from "@/context/AuthContext";
 import { getChildrenByParent } from "@/lib/firestore/children";
 import type { Child } from "@/types";
@@ -54,10 +55,28 @@ export default function ParentCertificatePage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Sertifikat</h1>
-      <p className="mt-1 text-sm text-slate-500">
-        12 həftəlik proqram tamamlandıqda avtomatik PDF sertifikat, QR kod və unikal nömrə yaradılır.
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Sertifikat</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            12 həftəlik proqram tamamlandıqda avtomatik PDF sertifikat, QR kod və unikal nömrə yaradılır.
+          </p>
+        </div>
+        <HelpModal title="Sertifikat necə əldə olunur?">
+          <p>
+            Övladınız <strong>Kurslar</strong> bölməsindəki 12 modulu (12 həftəni) tamamladıqdan
+            sonra bu səhifədən sertifikatı yükləyə bilərsiniz.
+          </p>
+          <p>
+            Sertifikatda övladınızın adı, tamamlama tarixi, unikal nömrə və yoxlama üçün QR kod var —
+            bunu çap edib saxlaya, yaxud elektron şəkildə paylaşa bilərsiniz.
+          </p>
+          <p className="text-xs text-slate-500">
+            Hələ 12 modulu bitirməmisinizsə, "Kurslar" bölməsindən davam edin — irəliləyişiniz
+            avtomatik izlənilir.
+          </p>
+        </HelpModal>
+      </div>
 
       <Card className="mt-6 max-w-md text-center">
         {isCompleted ? (

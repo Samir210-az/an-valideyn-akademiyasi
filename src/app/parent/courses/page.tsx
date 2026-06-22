@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { HelpModal } from "@/components/shared/HelpModal";
 import { getModules, getLessonsByModule } from "@/lib/firestore/modules";
 import type { Module, Lesson } from "@/types";
 
@@ -31,8 +32,26 @@ export default function ParentCoursesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Kurslar</h1>
-      <p className="mt-1 text-sm text-slate-500">12 həftəlik proqramın bütün modulları</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Kurslar</h1>
+          <p className="mt-1 text-sm text-slate-500">12 həftəlik proqramın bütün modulları</p>
+        </div>
+        <HelpModal title="Kurslardan necə istifadə etməli?">
+          <p>
+            Hər <strong>modulun</strong> üstünə basın — açılır və içindəki dərsləri görürsünüz. Bir
+            dərsin üstünə basıb <strong>"Oxu"</strong> deyəndə, tam mətn və şəkil görünəcək.
+          </p>
+          <p>
+            Modulları sırayla (1-dən 12-yə) keçməyiniz tövsiyə olunur — hər modul əvvəlkinin
+            üzərində qurulur. Həftədə 1 modul tempi ilə getsəniz, 12 həftəyə tamamlayarsınız.
+          </p>
+          <p className="rounded-lg bg-indigo-50 px-3 py-2 text-xs text-indigo-800">
+            💡 Hər dərsdə konkret, evdə dərhal tətbiq edə biləcəyiniz addımlar var. Oxuduqdan sonra
+            "Gündəlik" bölməsində nəticələri qeyd etsəniz, irəliləyişi izləyə bilərsiniz.
+          </p>
+        </HelpModal>
+      </div>
 
       <div className="mt-6 space-y-3">
         {modules.map((m) => (

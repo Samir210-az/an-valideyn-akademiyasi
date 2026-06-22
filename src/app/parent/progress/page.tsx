@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { HelpModal } from "@/components/shared/HelpModal";
 import { useAuth } from "@/context/AuthContext";
 import { getChildrenByParent } from "@/lib/firestore/children";
 import { getDiaryEntries } from "@/lib/firestore/diary";
@@ -68,8 +69,33 @@ export default function ParentProgressPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">İnkişaf izləmə</h1>
-      <p className="mt-1 text-sm text-slate-500">{child.name} üçün son 14 günün dinamikası</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">İnkişaf izləmə</h1>
+          <p className="mt-1 text-sm text-slate-500">{child.name} üçün son 14 günün dinamikası</p>
+        </div>
+        <HelpModal title="AI Həftəlik Xülasə necə işləyir?">
+          <p>
+            Yuxarıdaki qrafik <strong>Gündəlik</strong> bölməsində doldurduğunuz qeydlərdən
+            avtomatik qurulur — ünsiyyət, aqressiya və tapşırıq icrasının son 14 gündəki dəyişimini
+            göstərir. Xətt yuxarı/aşağı getdikcə, tendensiyanı vizual görə bilərsiniz.
+          </p>
+          <p>
+            <strong>"Xülasə hazırla"</strong> düyməsinə basanda, süni intellekt (AI) son gündəlik
+            qeydlərinizi oxuyur və sadə dildə bir neçə cümləlik xülasə yazır — məsələn, hansı
+            sahədə irəliləyiş var, hansı sahədə dəstək lazım ola bilər.
+          </p>
+          <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            ⚠️ Vacib: AI <strong>diaqnoz qoymur, müalicə təyin etmir</strong>. O, sadəcə sizin
+            yazdıqlarınızı ümumiləşdirir. Xülasədə narahatedici nəsə görsəniz, bunu mütəxəssisinizlə
+            müzakirə edin — son qərarı həmişə insan mütəxəssis verir.
+          </p>
+          <p>
+            Əgər qrafik boşdursa, demək, hələ kifayət qədər gündəlik qeyd yoxdur — Gündəlik
+            bölməsindən bir neçə gün ardıcıl qeyd əlavə edin.
+          </p>
+        </HelpModal>
+      </div>
 
       <Card className="mt-6">
         <p className="mb-4 text-sm font-medium text-slate-700">Ünsiyyət / Aqressiya / Tapşırıq icrası</p>

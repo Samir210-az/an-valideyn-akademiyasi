@@ -4,6 +4,7 @@ import { useEffect, useState, FormEvent } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { HelpModal } from "@/components/shared/HelpModal";
 import { useAuth } from "@/context/AuthContext";
 import { getChildrenByParent } from "@/lib/firestore/children";
 import { getDiaryEntries, upsertDiaryEntry } from "@/lib/firestore/diary";
@@ -70,10 +71,36 @@ export default function ParentDiaryPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Gündəlik</h1>
-      <p className="mt-1 text-sm text-slate-500">
-        Hər gün {child.name} üçün qısa qeydlər doldurun (1 = aşağı, 5 = yüksək)
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Gündəlik</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Hər gün {child.name} üçün qısa qeydlər doldurun (1 = aşağı, 5 = yüksək)
+          </p>
+        </div>
+        <HelpModal title="Gündəlik nə üçündür?">
+          <p>
+            Bu səhifədə hər gün <strong>2-3 dəqiqə</strong> sərf edib övladınızın o günkü vəziyyətini
+            qeyd edirsiniz. Beş sadə şkala var: yuxu, qidalanma, aqressiya səviyyəsi, ünsiyyət,
+            tapşırıq icrası. Hər birini 1-dən 5-ə qədər seçin — düzgün/səhv cavab yoxdur, sadəcə
+            sizin müşahidənizdir.
+          </p>
+          <p>
+            <strong>Qışqırma/kriz sayı</strong> sahəsinə o gün neçə dəfə ciddi qəzəb partlayışı
+            olduğunu yazın. <strong>Qeydlər</strong> sahəsinə isə sözlə əlavə izah yaza bilərsiniz
+            (məsələn: "bu gün bağçada çox səs-küy idi, ona görə narahat idi").
+          </p>
+          <p className="rounded-lg bg-indigo-50 px-3 py-2 text-xs text-indigo-800">
+            💡 Bu qeydlər <strong>"İnkişaf izləmə"</strong> səhifəsindəki qrafiki və AI həftəlik
+            xülasəsini formalaşdırır. Nə qədər müntəzəm (hər gün) doldursanız, AI bir o qədər dəqiq
+            təhlil verə bilər. Mütəxəssisiniz də bu qeydləri görür və uşağın vəziyyətini
+            qiymətləndirərkən istifadə edir.
+          </p>
+          <p className="text-xs text-slate-500">
+            Qeyd: bu, mütəxəssis müayinəsini əvəz etmir — sadəcə onu daha dəqiq məlumatla təmin edir.
+          </p>
+        </HelpModal>
+      </div>
 
       <Card className="mt-6 max-w-lg">
         <form onSubmit={handleSave} className="space-y-4">

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
+import { HelpModal } from "@/components/shared/HelpModal";
 import { getAllAssignments } from "@/lib/firestore/assignments";
 import { getUsersByRole } from "@/lib/firestore/users";
 import { getChildrenByParent } from "@/lib/firestore/children";
@@ -68,8 +69,38 @@ export default function SpecialistDashboardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Mütəxəssis Dashboard</h1>
-      <p className="mt-1 text-sm text-slate-500">Yoxlanılmamış tapşırıqlar və ümumi icmal</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Mütəxəssis Dashboard</h1>
+          <p className="mt-1 text-sm text-slate-500">Yoxlanılmamış tapşırıqlar və ümumi icmal</p>
+        </div>
+        <HelpModal title="AI Hesabat Layihəsindən necə istifadə etməli?">
+          <p>
+            <strong>Nə işdir bu?</strong> AI Hesabat Layihəsi — seçdiyiniz uşağın son 14 günlük
+            gündəlik qeydlərini (valideyn tərəfindən doldurulan) və tapşırıq nəticələrini oxuyub,
+            sizin üçün bir <strong>qaralama (draft)</strong> hesabat yazır.
+          </p>
+          <p>
+            <strong>Necə istifadə edim?</strong> Yuxarıdaki siyahıdan uşağı seçin →
+            "Hesabat hazırla" basın → bir neçə saniyəyə AI mətni görünəcək. Bu mətni{" "}
+            <strong>başlanğıc nöqtəsi</strong> kimi qəbul edin — öz peşəkar qiymətləndirmənizlə
+            müqayisə edin, lazım gəldikdə düzəldin, əlavə edin.
+          </p>
+          <p>
+            <strong>Nəyə əsaslanır?</strong> Yalnız valideynin yazdığı rəqəmsal göstəricilərə (yuxu,
+            aqressiya, ünsiyyət, tapşırıq icrası) və qeydlərə. AI uşağı şəxsən görməyib, müşahidə
+            etməyib — ona görə sizin klinik/peşəkar müşahidəniz hər zaman üstündür.
+          </p>
+          <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+            ⚠️ AI-nin yazdığı mətn DİAQNOZ deyil və rəsmi sənəd kimi imzalanmamalıdır. Onu redaktə
+            edib öz peşəkar rəyinizlə birləşdirdikdən sonra istifadə edin.
+          </p>
+          <p className="text-xs text-slate-500">
+            Tövsiyə: hesabatı həftədə bir dəfə yaradıb, qeydlərinizlə müqayisə etsəniz, uşağın
+            zaman içində necə dəyişdiyini daha rahat izləyə bilərsiniz.
+          </p>
+        </HelpModal>
+      </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <Card>

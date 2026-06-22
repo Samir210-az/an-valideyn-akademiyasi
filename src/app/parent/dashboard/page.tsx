@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { HelpModal } from "@/components/shared/HelpModal";
 import { useAuth } from "@/context/AuthContext";
 import { getChildrenByParent, createChild } from "@/lib/firestore/children";
 import { getAssignmentsByChild } from "@/lib/firestore/assignments";
@@ -99,6 +100,38 @@ export default function ParentDashboardPage() {
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">Dashboard</h1>
           <p className="mt-1 text-sm text-slate-500">Uşağınızın inkişaf icmalı</p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <HelpModal title="Sayt necə işləyir?">
+            <p>
+              Xoş gəlmisiniz! Bu, övladınızın inkişafını izləmək və 12 həftəlik proqramı keçmək üçün
+              platformanızdır. Aşağıdakı bölmələr var:
+            </p>
+            <p>
+              <strong>📚 Kurslar</strong> — 12 modulluq təlim proqramı. Hər modulda sadə dildə dərslər
+              var, oxuyub praktiki tövsiyələri evdə tətbiq edin.
+            </p>
+            <p>
+              <strong>📝 Gündəlik</strong> — hər gün övladınızın yuxusu, davranışı, ünsiyyəti haqqında
+              qısa qeyd yazın. Bu qeydlər <strong>AI üçün məlumat mənbəyidir</strong> — nə qədər
+              müntəzəm yazsanız, AI bir o qədər dəqiq xülasə hazırlaya bilər.
+            </p>
+            <p>
+              <strong>📈 İnkişaf izləmə</strong> — qeydləriniz əsasında qrafik və AI həftəlik xülasəsi.
+            </p>
+            <p>
+              <strong>✅ Tapşırıqlar</strong> — mütəxəssisin verdiyi tapşırıqları (video/şəkil/qeyd)
+              buradan göndərirsiniz, mütəxəssis baxıb rəy yazır.
+            </p>
+            <p>
+              <strong>💬 Mesajlar</strong> — mütəxəssislə birbaşa yazışma.
+            </p>
+            <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              ⚠️ AI heç vaxt diaqnoz qoymur. O, sizin yazdıqlarınızı ümumiləşdirir və mütəxəssisə
+              kömək edir — son qiymətləndirməni həmişə real mütəxəssis verir.
+            </p>
+          </HelpModal>
         </div>
 
         {children.length > 1 && (

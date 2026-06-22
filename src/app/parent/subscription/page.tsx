@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { HelpModal } from "@/components/shared/HelpModal";
 import { useAuth } from "@/context/AuthContext";
 import { PACKAGES } from "@/lib/payments/packages";
 import { getSubscription, type SubscriptionDoc } from "@/lib/firestore/subscriptions";
@@ -71,8 +72,21 @@ export default function ParentSubscriptionPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Abunəlik paketləri</h1>
-      <p className="mt-1 text-sm text-slate-500">Ehtiyacınıza uyğun paketi seçin</p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Abunəlik paketləri</h1>
+          <p className="mt-1 text-sm text-slate-500">Ehtiyacınıza uyğun paketi seçin</p>
+        </div>
+        <HelpModal title="Paketlər arasında fərq nədir?">
+          <p><strong>Basic</strong> — kursa giriş, aylıq 1 modul sürəti ilə, email dəstəyi.</p>
+          <p><strong>Standard</strong> — tam kursa giriş, mütəxəssis rəyi, chat dəstəyi.</p>
+          <p><strong>Premium</strong> — Standard-ın hamısı + həftəlik fərdi rəy, prioritet dəstək, sertifikat.</p>
+          <p className="text-xs text-slate-500">
+            Əgər ödəniş düyməsi xəta versə, admin ilə əlaqə saxlayın — sizin üçün abunəliyi əl ilə
+            aktivləşdirə bilərlər.
+          </p>
+        </HelpModal>
+      </div>
 
       {error && (
         <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>

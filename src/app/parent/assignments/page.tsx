@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { HelpModal } from "@/components/shared/HelpModal";
 import { useAuth } from "@/context/AuthContext";
 import { getChildrenByParent } from "@/lib/firestore/children";
 import { getAssignmentsByChild, submitAssignment } from "@/lib/firestore/assignments";
@@ -46,10 +47,28 @@ export default function ParentAssignmentsPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-slate-900">Tapşırıqlar</h1>
-      <p className="mt-1 text-sm text-slate-500">
-        Mütəxəssis tərəfindən təyin olunmuş ev tapşırıqları
-      </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Tapşırıqlar</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            Mütəxəssis tərəfindən təyin olunmuş ev tapşırıqları
+          </p>
+        </div>
+        <HelpModal title="Tapşırıqları necə göndərməli?">
+          <p>
+            Mütəxəssis sizə konkret tapşırıq (məsələn, "3 dəqiqəlik göz təması məşqi" və ya
+            "davranışı video çəkib göndər") verəndə, o, bu səhifədə görünəcək.
+          </p>
+          <p>
+            Tapşırığı yerinə yetirdikdən sonra <strong>video, şəkil linki və ya qısa qeyd</strong>{" "}
+            əlavə edib "Göndər" basın. Mütəxəssis baxıb rəy və bal yazacaq.
+          </p>
+          <p className="text-xs text-slate-500">
+            Video/şəkil linkini Google Drive, YouTube (gizli link) kimi platformalardan əldə edib
+            buraya yapışdıra bilərsiniz.
+          </p>
+        </HelpModal>
+      </div>
 
       <div className="mt-6 space-y-4">
         {assignments.length === 0 && (
