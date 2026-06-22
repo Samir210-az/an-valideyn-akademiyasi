@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
 import { logoutUser } from "@/lib/auth-helpers";
-import { useRouter } from "next/navigation";
 
 const links = [
   { href: "/admin/dashboard", label: "Dashboard" },
@@ -17,7 +16,6 @@ const links = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
-  const router = useRouter();
 
   return (
     <aside className="flex h-screen w-64 flex-col border-r border-slate-200 bg-white px-4 py-6">
@@ -44,9 +42,13 @@ export function AdminSidebar() {
       </nav>
 
       <button
-        onClick={async () => {
-          await logoutUser();
-          router.push("/login");
+        onClick={async (e) => {
+          e.stopPropagation();
+          try {
+            await logoutUser();
+          } finally {
+            window.location.href = "/login";
+          }
         }}
         className="rounded-lg px-3 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50"
       >
