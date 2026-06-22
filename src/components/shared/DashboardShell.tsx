@@ -3,18 +3,25 @@
 import { ReactNode, useState } from "react";
 import { logoutUser } from "@/lib/auth-helpers";
 
+type Accent = "admin" | "parent" | "specialist";
+
 interface DashboardShellProps {
   sidebar: ReactNode;
   title: string;
   children: ReactNode;
-  /** Panelə görə fərqli isti ton (default: admin) */
-  accent?: "admin" | "parent" | "specialist";
+  accent?: Accent;
 }
 
-const ACCENT_BG: Record<NonNullable<DashboardShellProps["accent"]>, string> = {
-  admin: "bg-gradient-to-br from-indigo-50 via-violet-50 to-rose-50",
-  parent: "bg-gradient-to-br from-orange-50 via-amber-50 to-indigo-50",
-  specialist: "bg-gradient-to-br from-emerald-50 via-teal-50 to-indigo-50",
+const ACCENT_BG: Record<Accent, string> = {
+  admin: "bg-gradient-to-br from-slate-100 via-indigo-50/60 to-slate-100",
+  parent: "bg-gradient-to-br from-orange-50 via-rose-50/50 to-indigo-50/60",
+  specialist: "bg-gradient-to-br from-teal-50 via-emerald-50/50 to-indigo-50/50",
+};
+
+const ACCENT_HEADER: Record<Accent, string> = {
+  admin: "bg-white/90",
+  parent: "bg-white/90",
+  specialist: "bg-white/90",
 };
 
 async function handleLogout() {
@@ -27,10 +34,10 @@ async function handleLogout() {
 
 /**
  * Admin/Mütəxəssis/Valideyn panelləri üçün ortaq, mobil-responsiv shell.
+ * Hər rol üçün yüngül, fərqli fon tonu var ki, hamısı eyni "ağ səhifə" kimi görünməsin.
  * Böyük ekranlarda (lg+) sidebar həmişə görünür. Mobil ekranlarda sidebar
  * "drawer" (yan pəncərə) kimi açılıb-bağlanır, content kənara çıxmır.
  * Çıxış düyməsi mobil üst paneldə HƏMIŞƏ görünür (menyu açmağa ehtiyac yoxdur).
- * Fon hər panel üçün yumşaq, isti tonlu gradientdir — sadəcə ağ rəng yormasın deyə.
  */
 export function DashboardShell({ sidebar, title, children, accent = "admin" }: DashboardShellProps) {
   const [open, setOpen] = useState(false);
@@ -38,7 +45,7 @@ export function DashboardShell({ sidebar, title, children, accent = "admin" }: D
   return (
     <div className={`min-h-screen ${ACCENT_BG[accent]}`}>
       {/* Mobil üst panel */}
-      <div className="flex items-center justify-between border-b border-slate-200/70 bg-white/70 px-4 py-3 backdrop-blur-sm lg:hidden">
+      <div className={`flex items-center justify-between border-b border-slate-200 px-4 py-3 backdrop-blur-sm lg:hidden ${ACCENT_HEADER[accent]}`}>
         <button
           onClick={() => setOpen(true)}
           aria-label="Menyu aç"

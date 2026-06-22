@@ -20,8 +20,8 @@ export function ParentSidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-slate-200 bg-white px-4 py-6">
-      <div className="mb-8 px-2">
+    <aside className="flex h-screen w-64 flex-col border-l-4 border-l-rose-400 border-r border-slate-200 bg-white px-4 py-6">
+      <div className="mb-8 rounded-xl bg-rose-50 px-3 py-3">
         <p className="text-lg font-semibold text-slate-900">AN Akademiya</p>
         <p className="text-xs text-slate-500">Valideyn Paneli</p>
       </div>
