@@ -23,9 +23,9 @@ export function Hero() {
           alt="AN Valideyn Akademiyası — uşaqlar oyun otağında"
           fill
           priority
-          className="object-cover"
+          className="object-cover saturate-125 contrast-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/70 via-indigo-900/55 to-white" />
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950/55 via-purple-900/35 to-indigo-950/80" />
       </motion.div>
 
       {/* Floating decorative blobs */}
