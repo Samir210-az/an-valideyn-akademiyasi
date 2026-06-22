@@ -25,7 +25,7 @@ export function Footer() {
         <p>© {new Date().getFullYear()} AN Valideyn Akademiyası. Bütün hüquqlar qorunur.</p>
         <div className="flex items-center gap-4">
           <a
-            href="https://instagram.com/"
+            href="https://instagram.com/s_akhunoff"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1 hover:text-foreground transition-colors"
