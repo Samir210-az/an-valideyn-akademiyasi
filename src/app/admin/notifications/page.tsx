@@ -26,6 +26,16 @@ export default function AdminNotificationsPage() {
       target,
       createdAt: serverTimestamp(),
     });
+
+    // Real push notification (FCM) göndərişi
+    await fetch("/api/notifications/send", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, body, target }),
+    }).catch(() => {
+      // Push göndərilməsə belə, Firestore qeydi saxlanılıb — istifadəçi səhifədə görəcək.
+    });
+
     setSending(false);
     setSent(true);
     setTitle("");

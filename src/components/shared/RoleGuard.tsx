@@ -3,6 +3,7 @@
 import { ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import type { UserRole } from "@/types";
 
 interface RoleGuardProps {
@@ -12,11 +13,14 @@ interface RoleGuardProps {
 
 /**
  * Səhifəni yalnız müəyyən rollara malik daxil olmuş istifadəçilər üçün açır.
- * Digər hallarda /login-ə yönləndirir.
+ * Digər hallarda /login-ə yönləndirir. Eyni zamanda push notification icazəsini
+ * idarə edir.
  */
 export function RoleGuard({ allowedRoles, children }: RoleGuardProps) {
   const { appUser, firebaseUser, loading } = useAuth();
   const router = useRouter();
+
+  usePushNotifications();
 
   useEffect(() => {
     if (loading) return;
