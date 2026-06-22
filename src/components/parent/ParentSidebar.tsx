@@ -12,6 +12,7 @@ const links = [
   { href: "/parent/diary", label: "Gündəlik" },
   { href: "/parent/progress", label: "İnkişaf izləmə" },
   { href: "/parent/messages", label: "Mesajlar" },
+  { href: "/parent/subscription", label: "Abunəlik" },
   { href: "/parent/certificate", label: "Sertifikat" },
 ];
 
