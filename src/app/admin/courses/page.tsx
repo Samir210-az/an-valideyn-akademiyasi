@@ -51,23 +51,44 @@ export default function AdminCoursesPage() {
 
   async function handleSeedDefaultModules() {
     setLoading(true);
-    const existingTitles = new Set(modules.map((m) => m.title.trim().toLowerCase()));
+    const existingByTitle = new Map(modules.map((m) => [m.title.trim().toLowerCase(), m]));
 
     for (const course of DEFAULT_COURSES) {
-      // Eyni başlıqlı modul artıq varsa, YENİDƏN YARATMA — bu, təkrarlanmanın qarşısını alır.
-      if (existingTitles.has(course.title.trim().toLowerCase())) continue;
+      const key = course.title.trim().toLowerCase();
+      const existingModule = existingByTitle.get(key);
 
-      const moduleId = await createModule({
-        order: course.order,
-        title: course.title,
-        description: course.description,
-      });
+      if (!existingModule) {
+        // Modul ümumiyyətlə yoxdursa — modulu və bütün dərslərini yarat.
+        const moduleId = await createModule({
+          order: course.order,
+          title: course.title,
+          description: course.description,
+        });
+
+        for (let i = 0; i < course.lessons.length; i++) {
+          const lesson = course.lessons[i];
+          await createLesson({
+            moduleId,
+            order: i + 1,
+            title: lesson.title,
+            articleContent: lesson.articleContent,
+            imageUrl: lesson.imageUrl,
+          });
+        }
+        continue;
+      }
+
+      // Modul artıq varsa — YALNIZ çatışmayan dərsləri (başlığa görə) əlavə et.
+      const existingLessons = await getLessonsByModule(existingModule.id);
+      const existingLessonTitles = new Set(existingLessons.map((l) => l.title.trim().toLowerCase()));
 
       for (let i = 0; i < course.lessons.length; i++) {
         const lesson = course.lessons[i];
+        if (existingLessonTitles.has(lesson.title.trim().toLowerCase())) continue;
+
         await createLesson({
-          moduleId,
-          order: i + 1,
+          moduleId: existingModule.id,
+          order: existingLessons.length + i + 1,
           title: lesson.title,
           articleContent: lesson.articleContent,
           imageUrl: lesson.imageUrl,
@@ -75,6 +96,7 @@ export default function AdminCoursesPage() {
       }
     }
     await refreshModules();
+    alert("Default məzmun yoxlanıldı — çatışmayan modul/dərslər əlavə olundu.");
   }
 
   async function handleCleanupDuplicates() {
