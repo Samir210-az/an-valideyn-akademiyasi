@@ -1,6 +1,7 @@
 "use client";
 
 import { ReactNode, useState } from "react";
+import { logoutUser } from "@/lib/auth-helpers";
 
 interface DashboardShellProps {
   sidebar: ReactNode;
@@ -8,10 +9,19 @@ interface DashboardShellProps {
   children: ReactNode;
 }
 
+async function handleLogout() {
+  try {
+    await logoutUser();
+  } finally {
+    window.location.href = "/login";
+  }
+}
+
 /**
  * Admin/Mütəxəssis/Valideyn panelləri üçün ortaq, mobil-responsiv shell.
  * Böyük ekranlarda (lg+) sidebar həmişə görünür. Mobil ekranlarda sidebar
  * "drawer" (yan pəncərə) kimi açılıb-bağlanır, content kənara çıxmır.
+ * Çıxış düyməsi mobil üst paneldə HƏMIŞƏ görünür (menyu açmağa ehtiyac yoxdur).
  */
 export function DashboardShell({ sidebar, title, children }: DashboardShellProps) {
   const [open, setOpen] = useState(false);
@@ -32,7 +42,17 @@ export function DashboardShell({ sidebar, title, children }: DashboardShellProps
           </svg>
         </button>
         <p className="text-sm font-semibold text-slate-900">{title}</p>
-        <div className="w-9" />
+        <button
+          onClick={handleLogout}
+          aria-label="Çıxış"
+          className="flex items-center gap-1 rounded-lg p-2 text-red-600 hover:bg-red-50"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+        </button>
       </div>
 
       <div className="flex">
