@@ -66,8 +66,16 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /broadcastNotifications/{id} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
     match /subscriptions/{subId} {
-      allow read: if isAdmin() || (isParent() && resource.data.parentId == request.auth.uid);
+      // QEYD: subId == parentId (doc ID kimi parentId istifadə olunur).
+      // Bu sayədə sənəd hələ MÖVCUD OLMASA belə (yeni valideyn) icazə yoxlaması
+      // "resource.data" oxumadan, birbaşa ID müqayisəsi ilə işləyir — permission-denied xətası yaranmır.
+      allow read: if isAdmin() || (isParent() && request.auth.uid == subId);
       allow write: if isAdmin();
     }
 

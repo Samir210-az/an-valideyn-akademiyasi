@@ -2,6 +2,7 @@
 
 import { ReactNode, useState } from "react";
 import { logoutUser } from "@/lib/auth-helpers";
+import { NotificationBell } from "@/components/shared/NotificationBell";
 
 type Accent = "admin" | "parent" | "specialist";
 
@@ -58,17 +59,20 @@ export function DashboardShell({ sidebar, title, children, accent = "admin" }: D
           </svg>
         </button>
         <p className="text-sm font-semibold text-slate-900">{title}</p>
-        <button
-          onClick={handleLogout}
-          aria-label="Çıxış"
-          className="flex items-center gap-1 rounded-lg p-2 text-red-600 hover:bg-red-50"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-1">
+          <NotificationBell />
+          <button
+            onClick={handleLogout}
+            aria-label="Çıxış"
+            className="flex items-center gap-1 rounded-lg p-2 text-red-600 hover:bg-red-50"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div className="flex">
@@ -91,7 +95,12 @@ export function DashboardShell({ sidebar, title, children, accent = "admin" }: D
         </div>
 
         {/* Əsas content — kənara çıxmasın deyə min-w-0 və overflow-hidden */}
-        <main className="min-w-0 flex-1 overflow-x-hidden p-4 sm:p-6 lg:p-8">{children}</main>
+        <div className="min-w-0 flex-1">
+          <div className="hidden items-center justify-end gap-2 border-b border-slate-200 bg-white/70 px-6 py-2 backdrop-blur-sm lg:flex">
+            <NotificationBell />
+          </div>
+          <main className="overflow-x-hidden p-4 sm:p-6 lg:p-8">{children}</main>
+        </div>
       </div>
     </div>
   );

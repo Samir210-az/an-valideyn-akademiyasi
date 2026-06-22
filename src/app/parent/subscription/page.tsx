@@ -21,10 +21,10 @@ export default function ParentSubscriptionPage() {
 
   useEffect(() => {
     if (!appUser) return;
-    getSubscription(appUser.uid).then((sub) => {
-      setSubscription(sub);
-      setChecking(false);
-    });
+    getSubscription(appUser.uid)
+      .then((sub) => setSubscription(sub))
+      .catch(() => setSubscription(null))
+      .finally(() => setChecking(false));
   }, [appUser]);
 
   async function handleSubscribe(tier: PackageTier) {

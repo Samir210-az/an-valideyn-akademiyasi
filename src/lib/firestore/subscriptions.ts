@@ -13,8 +13,14 @@ export interface SubscriptionDoc {
 
 export async function getSubscription(parentId: string): Promise<SubscriptionDoc | null> {
   if (!db) return null;
-  const snap = await getDoc(doc(db, "subscriptions", parentId));
-  return snap.exists() ? (snap.data() as SubscriptionDoc) : null;
+  try {
+    const snap = await getDoc(doc(db, "subscriptions", parentId));
+    return snap.exists() ? (snap.data() as SubscriptionDoc) : null;
+  } catch {
+    // Sənəd hələ yoxdursa və ya icazə qaydası gecikibsə, "abunəlik yoxdur" kimi qəbul et —
+    // səhifəni əbədi "yüklənir" vəziyyətində saxlamamaq üçün.
+    return null;
+  }
 }
 
 /**
