@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select } from "@/components/ui/select";
-import { getAllUsers } from "@/lib/firestore/users";
+import { useAuth } from "@/context/AuthContext";
+import { getAllUsers, updateUserRole, deleteUserProfile } from "@/lib/firestore/users";
 import { getSubscription, setSubscriptionManual, deactivateSubscription } from "@/lib/firestore/subscriptions";
-import type { AppUser, PackageTier } from "@/types";
+import type { AppUser, PackageTier, UserRole } from "@/types";
 
 const roleLabel: Record<AppUser["role"], string> = {
   admin: "Admin",
@@ -21,6 +22,7 @@ const tierLabel: Record<PackageTier, string> = {
 };
 
 export default function AdminUsersPage() {
+  const { appUser } = useAuth();
   const [users, setUsers] = useState<AppUser[]>([]);
   const [filter, setFilter] = useState<AppUser["role"] | "all">("all");
   const [loading, setLoading] = useState(true);
@@ -28,16 +30,19 @@ export default function AdminUsersPage() {
   const [pendingTier, setPendingTier] = useState<Record<string, PackageTier>>({});
   const [busyUid, setBusyUid] = useState<string | null>(null);
 
+  async function loadUsers() {
+    const u = await getAllUsers();
+    setUsers(u);
+    setLoading(false);
+    const parents = u.filter((x) => x.role === "parent");
+    const entries = await Promise.all(
+      parents.map(async (p) => [p.uid, await getSubscription(p.uid)] as const)
+    );
+    setSubs(Object.fromEntries(entries.map(([uid, sub]) => [uid, sub ? { tier: sub.tier, status: sub.status } : null])));
+  }
+
   useEffect(() => {
-    getAllUsers().then(async (u) => {
-      setUsers(u);
-      setLoading(false);
-      const parents = u.filter((x) => x.role === "parent");
-      const entries = await Promise.all(
-        parents.map(async (p) => [p.uid, await getSubscription(p.uid)] as const)
-      );
-      setSubs(Object.fromEntries(entries.map(([uid, sub]) => [uid, sub ? { tier: sub.tier, status: sub.status } : null])));
-    });
+    loadUsers();
   }, []);
 
   async function handleActivate(uid: string) {
@@ -55,6 +60,34 @@ export default function AdminUsersPage() {
     setBusyUid(null);
   }
 
+  async function handleRoleChange(uid: string, role: UserRole) {
+    if (uid === appUser?.uid) {
+      alert("Öz rolunuzu bu paneldən dəyişə bilməzsiniz (özünüzü kənarlaşdırmamaq üçün).");
+      return;
+    }
+    setBusyUid(uid);
+    await updateUserRole(uid, role);
+    setUsers((prev) => prev.map((u) => (u.uid === uid ? { ...u, role } : u)));
+    setBusyUid(null);
+  }
+
+  async function handleDelete(u: AppUser) {
+    if (u.uid === appUser?.uid) {
+      alert("Öz hesabınızı silə bilməzsiniz.");
+      return;
+    }
+    if (
+      !confirm(
+        `"${u.fullName}" (${u.email}) hesabını silmək istədiyinizə əminsiniz? Bu, onun saytdan istifadəsini dərhal dayandıracaq.`
+      )
+    )
+      return;
+    setBusyUid(u.uid);
+    await deleteUserProfile(u.uid);
+    setUsers((prev) => prev.filter((x) => x.uid !== u.uid));
+    setBusyUid(null);
+  }
+
   const filtered = filter === "all" ? users : users.filter((u) => u.role === filter);
 
   return (
@@ -67,6 +100,10 @@ export default function AdminUsersPage() {
       <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
         ⚠️ Kart ödənişi (Payriff) hələ qoşulmayıb. Bu vaxta qədər valideynlərin abunəliyini bu səhifədən
         <strong> manual</strong> aktivləşdirə bilərsiniz.
+      </p>
+      <p className="mt-2 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600">
+        💡 Kimisə mütəxəssis etmək üçün: həmin şəxs əvvəlcə adi qeydiyyatdan keçsin, sonra aşağıdaki
+        cədvəldə onun "Rol" sahəsindən <strong>Mütəxəssis</strong>i seçin.
       </p>
 
       <div className="mt-4 flex gap-2">
@@ -92,27 +129,38 @@ export default function AdminUsersPage() {
               <th className="px-4 py-3 font-medium">Telefon</th>
               <th className="px-4 py-3 font-medium">Rol</th>
               <th className="px-4 py-3 font-medium">Abunəlik</th>
+              <th className="px-4 py-3 font-medium">Əməliyyat</th>
             </tr>
           </thead>
           <tbody>
             {!loading && filtered.length === 0 && (
               <tr>
-                <td colSpan={5} className="px-4 py-6 text-center text-slate-400">
+                <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
                   İstifadəçi tapılmadı.
                 </td>
               </tr>
             )}
             {filtered.map((u) => {
               const sub = subs[u.uid];
+              const isSelf = u.uid === appUser?.uid;
               return (
                 <tr key={u.uid} className="border-t border-slate-100">
-                  <td className="px-4 py-3 text-slate-800">{u.fullName}</td>
+                  <td className="px-4 py-3 text-slate-800">
+                    {u.fullName} {isSelf && <span className="text-xs text-slate-400">(siz)</span>}
+                  </td>
                   <td className="px-4 py-3 text-slate-600">{u.email}</td>
                   <td className="px-4 py-3 text-slate-600">{u.phone || "—"}</td>
                   <td className="px-4 py-3">
-                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-                      {roleLabel[u.role]}
-                    </span>
+                    <Select
+                      value={u.role}
+                      disabled={isSelf || busyUid === u.uid}
+                      onChange={(e) => handleRoleChange(u.uid, e.target.value as UserRole)}
+                      className="h-8 w-32 py-1 text-xs"
+                    >
+                      <option value="parent">Valideyn</option>
+                      <option value="specialist">Mütəxəssis</option>
+                      <option value="admin">Admin</option>
+                    </Select>
                   </td>
                   <td className="px-4 py-3">
                     {u.role !== "parent" ? (
@@ -152,6 +200,15 @@ export default function AdminUsersPage() {
                         </Button>
                       </div>
                     )}
+                  </td>
+                  <td className="px-4 py-3">
+                    <button
+                      disabled={isSelf || busyUid === u.uid}
+                      onClick={() => handleDelete(u)}
+                      className="text-xs text-red-600 hover:underline disabled:cursor-not-allowed disabled:text-slate-300"
+                    >
+                      Sil
+                    </button>
                   </td>
                 </tr>
               );
