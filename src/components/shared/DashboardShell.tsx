@@ -14,9 +14,9 @@ interface DashboardShellProps {
 }
 
 const ACCENT_BG: Record<Accent, string> = {
-  admin: "bg-slate-50",
-  parent: "bg-slate-50",
-  specialist: "bg-slate-50",
+  admin: "bg-slate-100",
+  parent: "bg-orange-50/60",
+  specialist: "bg-teal-50/50",
 };
 
 const ACCENT_BAR: Record<Accent, string> = {
