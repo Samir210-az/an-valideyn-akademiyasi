@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { callOpenAI, AI_SAFETY_PREAMBLE } from "@/lib/ai/openai-client";
+import { callOpenAI, AI_SAFETY_PREAMBLE } from "@/lib/ai/groq-client";
 import type { DiaryEntry, Assignment } from "@/types";
 
 interface RequestBody {

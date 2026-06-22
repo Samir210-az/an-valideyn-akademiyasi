@@ -1,7 +1,8 @@
-// OpenAI API ilə server-side əlaqə.
+// Groq API ilə server-side əlaqə (OpenAI-uyğun chat completions formatı).
 // VACİB: AI heç vaxt diaqnoz qoymur, yalnız müşahidə əsaslı icmal/tövsiyə verir.
 
-const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
+const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL = "llama-3.3-70b-versatile";
 
 export const AI_SAFETY_PREAMBLE = `
 Sən "AN Valideyn Akademiyası" platformasının köməkçi AI analitikasısan.
@@ -20,19 +21,19 @@ interface ChatMessage {
 }
 
 export async function callOpenAI(messages: ChatMessage[]): Promise<string> {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    throw new Error("OPENAI_API_KEY tapılmadı. .env.local-a əlavə edin.");
+    throw new Error("GROQ_API_KEY tapılmadı. .env.local-a əlavə edin.");
   }
 
-  const response = await fetch(OPENAI_API_URL, {
+  const response = await fetch(GROQ_API_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: "gpt-4o-mini",
+      model: GROQ_MODEL,
       messages,
       temperature: 0.4,
       max_tokens: 700,
@@ -41,7 +42,7 @@ export async function callOpenAI(messages: ChatMessage[]): Promise<string> {
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`OpenAI API xətası: ${response.status} ${errText}`);
+    throw new Error(`Groq API xətası: ${response.status} ${errText}`);
   }
 
   const data = await response.json();
