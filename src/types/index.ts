@@ -36,6 +36,7 @@ export interface Lesson {
   title: string;
   videoUrl?: string;
   articleContent?: string;
+  imageUrl?: string;
   pdfUrl?: string;
   quizId?: string;
   order: number;

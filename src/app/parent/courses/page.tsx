@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { getModules, getLessonsByModule } from "@/lib/firestore/modules";
@@ -9,6 +10,7 @@ export default function ParentCoursesPage() {
   const [modules, setModules] = useState<Module[]>([]);
   const [openModuleId, setOpenModuleId] = useState<string | null>(null);
   const [lessonsByModule, setLessonsByModule] = useState<Record<string, Lesson[]>>({});
+  const [openLessonId, setOpenLessonId] = useState<string | null>(null);
 
   useEffect(() => {
     getModules().then(setModules);
@@ -20,6 +22,7 @@ export default function ParentCoursesPage() {
       return;
     }
     setOpenModuleId(id);
+    setOpenLessonId(null);
     if (!lessonsByModule[id]) {
       const lessons = await getLessonsByModule(id);
       setLessonsByModule((prev) => ({ ...prev, [id]: lessons }));
@@ -38,10 +41,15 @@ export default function ParentCoursesPage() {
               onClick={() => toggleModule(m.id)}
               className="flex w-full items-center justify-between text-left"
             >
-              <span className="font-medium text-slate-900">
-                Modul {m.order}: {m.title}
-              </span>
-              <span className="text-sm text-slate-400">
+              <div>
+                <span className="font-medium text-slate-900">
+                  Modul {m.order}: {m.title}
+                </span>
+                {m.description && (
+                  <p className="mt-0.5 text-xs text-slate-500">{m.description}</p>
+                )}
+              </div>
+              <span className="ml-3 shrink-0 text-sm text-slate-400">
                 {openModuleId === m.id ? "Bağla" : "Aç"}
               </span>
             </button>
@@ -51,16 +59,74 @@ export default function ParentCoursesPage() {
                 {(lessonsByModule[m.id] ?? []).length === 0 ? (
                   <p className="text-sm text-slate-400">Bu modulda hələ dərs yoxdur.</p>
                 ) : (
-                  lessonsByModule[m.id].map((l) => (
-                    <div key={l.id} className="rounded-lg bg-slate-50 px-3 py-2.5 text-sm">
-                      <p className="font-medium text-slate-800">{l.title}</p>
-                      <p className="mt-1 text-xs text-slate-400">
-                        {[l.videoUrl && "Video", l.pdfUrl && "PDF", l.articleContent && "Məqalə", l.quizId && "Quiz"]
-                          .filter(Boolean)
-                          .join(" · ")}
-                      </p>
-                    </div>
-                  ))
+                  lessonsByModule[m.id].map((l) => {
+                    const isOpen = openLessonId === l.id;
+                    return (
+                      <div key={l.id} className="overflow-hidden rounded-lg bg-slate-50">
+                        <button
+                          onClick={() => setOpenLessonId(isOpen ? null : l.id)}
+                          className="flex w-full items-center justify-between px-3 py-2.5 text-left text-sm"
+                        >
+                          <span className="font-medium text-slate-800">{l.title}</span>
+                          <span className="ml-3 shrink-0 text-xs text-indigo-600">
+                            {isOpen ? "Bağla" : "Oxu"}
+                          </span>
+                        </button>
+
+                        {isOpen && (
+                          <div className="space-y-4 border-t border-slate-200 bg-white px-3 py-4">
+                            {l.imageUrl && (
+                              <div className="relative h-44 w-full overflow-hidden rounded-xl sm:h-56">
+                                <Image
+                                  src={l.imageUrl}
+                                  alt={l.title}
+                                  fill
+                                  className="object-cover"
+                                  unoptimized={l.imageUrl.endsWith(".svg")}
+                                />
+                              </div>
+                            )}
+
+                            {l.videoUrl && (
+                              <a
+                                href={l.videoUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="block rounded-lg bg-indigo-50 px-3 py-2 text-sm font-medium text-indigo-700 hover:bg-indigo-100"
+                              >
+                                ▶ Videoya bax
+                              </a>
+                            )}
+
+                            {l.articleContent && (
+                              <div className="space-y-3 text-sm leading-relaxed text-slate-700">
+                                {l.articleContent.split(/\n\n+/).map((para, idx) => (
+                                  <p key={idx} className="whitespace-pre-line">
+                                    {para}
+                                  </p>
+                                ))}
+                              </div>
+                            )}
+
+                            {l.pdfUrl && (
+                              <a
+                                href={l.pdfUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="block rounded-lg bg-slate-100 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
+                              >
+                                📄 PDF sənədinə bax
+                              </a>
+                            )}
+
+                            {!l.imageUrl && !l.videoUrl && !l.articleContent && !l.pdfUrl && (
+                              <p className="text-sm text-slate-400">Bu dərsə hələ məzmun əlavə olunmayıb.</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
                 )}
               </div>
             )}

@@ -13,22 +13,8 @@ import {
   createLesson,
   deleteLesson,
 } from "@/lib/firestore/modules";
+import { DEFAULT_COURSES } from "@/lib/seed/defaultCourses";
 import type { Module, Lesson } from "@/types";
-
-const DEFAULT_MODULES = [
-  "Autizmi anlamaq",
-  "Davranış idarəetməsi",
-  "Ünsiyyət bacarıqları",
-  "Nitqin inkişafı",
-  "Sensor inteqrasiya",
-  "Emosional tənzimləmə",
-  "Oyun terapiyası elementləri",
-  "Məktəbə hazırlıq",
-  "Sosial bacarıqlar",
-  "DEHB strategiyaları",
-  "Müstəqillik bacarıqları",
-  "Uzunmüddətli inkişaf planı",
-];
 
 export default function AdminCoursesPage() {
   const [modules, setModules] = useState<Module[]>([]);
@@ -43,6 +29,7 @@ export default function AdminCoursesPage() {
   const [lessonVideo, setLessonVideo] = useState("");
   const [lessonPdf, setLessonPdf] = useState("");
   const [lessonArticle, setLessonArticle] = useState("");
+  const [lessonImage, setLessonImage] = useState("");
 
   async function refreshModules() {
     const data = await getModules();
@@ -63,14 +50,60 @@ export default function AdminCoursesPage() {
   }, [selectedModule]);
 
   async function handleSeedDefaultModules() {
-    for (let i = 0; i < DEFAULT_MODULES.length; i++) {
-      await createModule({
-        order: i + 1,
-        title: DEFAULT_MODULES[i],
-        description: "",
+    setLoading(true);
+    const existingTitles = new Set(modules.map((m) => m.title.trim().toLowerCase()));
+
+    for (const course of DEFAULT_COURSES) {
+      // Eyni başlıqlı modul artıq varsa, YENİDƏN YARATMA — bu, təkrarlanmanın qarşısını alır.
+      if (existingTitles.has(course.title.trim().toLowerCase())) continue;
+
+      const moduleId = await createModule({
+        order: course.order,
+        title: course.title,
+        description: course.description,
       });
+
+      for (let i = 0; i < course.lessons.length; i++) {
+        const lesson = course.lessons[i];
+        await createLesson({
+          moduleId,
+          order: i + 1,
+          title: lesson.title,
+          articleContent: lesson.articleContent,
+          imageUrl: lesson.imageUrl,
+        });
+      }
     }
-    refreshModules();
+    await refreshModules();
+  }
+
+  async function handleCleanupDuplicates() {
+    if (!confirm("Eyni adlı təkrarlanan modullar (və onların dərsləri) silinəcək. Davam edilsin?")) return;
+    setLoading(true);
+
+    const seen = new Map<string, Module>();
+    const duplicates: Module[] = [];
+
+    // Hər modulu sırayla gəzib, eyni başlığı ƏVVƏLCƏ görmüşüksə, sonrakını "təkrar" sayırıq.
+    for (const m of [...modules].sort((a, b) => a.order - b.order)) {
+      const key = m.title.trim().toLowerCase();
+      if (seen.has(key)) {
+        duplicates.push(m);
+      } else {
+        seen.set(key, m);
+      }
+    }
+
+    for (const dup of duplicates) {
+      const dupLessons = await getLessonsByModule(dup.id);
+      for (const l of dupLessons) {
+        await deleteLesson(l.id);
+      }
+      await deleteModule(dup.id);
+    }
+
+    await refreshModules();
+    alert(`${duplicates.length} təkrarlanan modul silindi.`);
   }
 
   async function handleCreateModule(e: FormEvent) {
@@ -101,12 +134,14 @@ export default function AdminCoursesPage() {
       videoUrl: lessonVideo || undefined,
       pdfUrl: lessonPdf || undefined,
       articleContent: lessonArticle || undefined,
+      imageUrl: lessonImage || undefined,
       order: lessons.length + 1,
     });
     setLessonTitle("");
     setLessonVideo("");
     setLessonPdf("");
     setLessonArticle("");
+    setLessonImage("");
     getLessonsByModule(selectedModule.id).then(setLessons);
   }
 
@@ -119,13 +154,18 @@ export default function AdminCoursesPage() {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
       {/* Modullar siyahısı */}
       <Card className="lg:col-span-1">
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex items-center justify-between gap-2">
           <h2 className="font-semibold text-slate-900">Modullar</h2>
-          {modules.length === 0 && !loading && (
-            <Button variant="outline" onClick={handleSeedDefaultModules}>
-              12 modulu yarat
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleSeedDefaultModules} title="Mövcud olmayan modulları əlavə edir, təkrar yaratmır">
+              Default məzmunu yarat
             </Button>
-          )}
+            {modules.length > 0 && (
+              <Button variant="outline" onClick={handleCleanupDuplicates} className="border-red-200 text-red-600 hover:bg-red-50">
+                Təkrarları təmizlə
+              </Button>
+            )}
+          </div>
         </div>
 
         <div className="space-y-1.5">
@@ -200,7 +240,7 @@ export default function AdminCoursesPage() {
                       {l.order}. {l.title}
                     </p>
                     <p className="text-xs text-slate-400">
-                      {[l.videoUrl && "Video", l.pdfUrl && "PDF", l.articleContent && "Məqalə"]
+                      {[l.videoUrl && "Video", l.pdfUrl && "PDF", l.articleContent && "Məqalə", l.imageUrl && "Şəkil"]
                         .filter(Boolean)
                         .join(" · ") || "Məzmun əlavə olunmayıb"}
                     </p>
@@ -242,6 +282,15 @@ export default function AdminCoursesPage() {
                   value={lessonPdf}
                   onChange={(e) => setLessonPdf(e.target.value)}
                   placeholder="https://..."
+                />
+              </div>
+              <div>
+                <Label htmlFor="lessonImage">Şəkil linki (URL, opsional)</Label>
+                <Input
+                  id="lessonImage"
+                  value={lessonImage}
+                  onChange={(e) => setLessonImage(e.target.value)}
+                  placeholder="/images/lessons/autizm.svg"
                 />
               </div>
               <div>
