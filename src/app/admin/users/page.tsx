@@ -2,8 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/select";
 import { getAllUsers } from "@/lib/firestore/users";
-import type { AppUser } from "@/types";
+import { getSubscription, setSubscriptionManual, deactivateSubscription } from "@/lib/firestore/subscriptions";
+import type { AppUser, PackageTier } from "@/types";
 
 const roleLabel: Record<AppUser["role"], string> = {
   admin: "Admin",
@@ -11,17 +14,46 @@ const roleLabel: Record<AppUser["role"], string> = {
   parent: "Valideyn",
 };
 
+const tierLabel: Record<PackageTier, string> = {
+  basic: "Basic",
+  standard: "Standard",
+  premium: "Premium",
+};
+
 export default function AdminUsersPage() {
   const [users, setUsers] = useState<AppUser[]>([]);
   const [filter, setFilter] = useState<AppUser["role"] | "all">("all");
   const [loading, setLoading] = useState(true);
+  const [subs, setSubs] = useState<Record<string, { tier: PackageTier; status: string } | null>>({});
+  const [pendingTier, setPendingTier] = useState<Record<string, PackageTier>>({});
+  const [busyUid, setBusyUid] = useState<string | null>(null);
 
   useEffect(() => {
-    getAllUsers().then((u) => {
+    getAllUsers().then(async (u) => {
       setUsers(u);
       setLoading(false);
+      const parents = u.filter((x) => x.role === "parent");
+      const entries = await Promise.all(
+        parents.map(async (p) => [p.uid, await getSubscription(p.uid)] as const)
+      );
+      setSubs(Object.fromEntries(entries.map(([uid, sub]) => [uid, sub ? { tier: sub.tier, status: sub.status } : null])));
     });
   }, []);
+
+  async function handleActivate(uid: string) {
+    const tier = pendingTier[uid] ?? "standard";
+    setBusyUid(uid);
+    await setSubscriptionManual(uid, tier);
+    setSubs((prev) => ({ ...prev, [uid]: { tier, status: "active" } }));
+    setBusyUid(null);
+  }
+
+  async function handleDeactivate(uid: string) {
+    setBusyUid(uid);
+    await deactivateSubscription(uid);
+    setSubs((prev) => ({ ...prev, [uid]: prev[uid] ? { ...prev[uid]!, status: "inactive" } : null }));
+    setBusyUid(null);
+  }
 
   const filtered = filter === "all" ? users : users.filter((u) => u.role === filter);
 
@@ -30,6 +62,11 @@ export default function AdminUsersPage() {
       <h1 className="text-2xl font-semibold text-slate-900">İstifadəçilər</h1>
       <p className="mt-1 text-sm text-slate-500">
         Bütün admin, mütəxəssis və valideyn hesapları
+      </p>
+
+      <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+        ⚠️ Kart ödənişi (Payriff) hələ qoşulmayıb. Bu vaxta qədər valideynlərin abunəliyini bu səhifədən
+        <strong> manual</strong> aktivləşdirə bilərsiniz.
       </p>
 
       <div className="mt-4 flex gap-2">
@@ -46,7 +83,7 @@ export default function AdminUsersPage() {
         ))}
       </div>
 
-      <Card className="mt-4 overflow-hidden p-0">
+      <Card className="mt-4 overflow-x-auto p-0">
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 text-slate-500">
             <tr>
@@ -54,28 +91,71 @@ export default function AdminUsersPage() {
               <th className="px-4 py-3 font-medium">Email</th>
               <th className="px-4 py-3 font-medium">Telefon</th>
               <th className="px-4 py-3 font-medium">Rol</th>
+              <th className="px-4 py-3 font-medium">Abunəlik</th>
             </tr>
           </thead>
           <tbody>
             {!loading && filtered.length === 0 && (
               <tr>
-                <td colSpan={4} className="px-4 py-6 text-center text-slate-400">
+                <td colSpan={5} className="px-4 py-6 text-center text-slate-400">
                   İstifadəçi tapılmadı.
                 </td>
               </tr>
             )}
-            {filtered.map((u) => (
-              <tr key={u.uid} className="border-t border-slate-100">
-                <td className="px-4 py-3 text-slate-800">{u.fullName}</td>
-                <td className="px-4 py-3 text-slate-600">{u.email}</td>
-                <td className="px-4 py-3 text-slate-600">{u.phone || "—"}</td>
-                <td className="px-4 py-3">
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
-                    {roleLabel[u.role]}
-                  </span>
-                </td>
-              </tr>
-            ))}
+            {filtered.map((u) => {
+              const sub = subs[u.uid];
+              return (
+                <tr key={u.uid} className="border-t border-slate-100">
+                  <td className="px-4 py-3 text-slate-800">{u.fullName}</td>
+                  <td className="px-4 py-3 text-slate-600">{u.email}</td>
+                  <td className="px-4 py-3 text-slate-600">{u.phone || "—"}</td>
+                  <td className="px-4 py-3">
+                    <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">
+                      {roleLabel[u.role]}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {u.role !== "parent" ? (
+                      <span className="text-slate-400">—</span>
+                    ) : sub?.status === "active" ? (
+                      <div className="flex items-center gap-2">
+                        <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+                          {tierLabel[sub.tier]} · aktiv
+                        </span>
+                        <button
+                          disabled={busyUid === u.uid}
+                          onClick={() => handleDeactivate(u.uid)}
+                          className="text-xs text-red-500 hover:underline"
+                        >
+                          Söndür
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Select
+                          value={pendingTier[u.uid] ?? "standard"}
+                          onChange={(e) =>
+                            setPendingTier((prev) => ({ ...prev, [u.uid]: e.target.value as PackageTier }))
+                          }
+                          className="h-8 w-28 py-1 text-xs"
+                        >
+                          <option value="basic">Basic</option>
+                          <option value="standard">Standard</option>
+                          <option value="premium">Premium</option>
+                        </Select>
+                        <Button
+                          loading={busyUid === u.uid}
+                          onClick={() => handleActivate(u.uid)}
+                          className="h-8 px-3 text-xs"
+                        >
+                          Aktivləşdir
+                        </Button>
+                      </div>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </Card>

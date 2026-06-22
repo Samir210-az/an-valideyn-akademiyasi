@@ -1,16 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { PACKAGES } from "@/lib/payments/packages";
+import { getSubscription, type SubscriptionDoc } from "@/lib/firestore/subscriptions";
 import type { PackageTier } from "@/types";
+
+const FRIENDLY_ERROR =
+  "Hazırda kart ödənişi texniki sazlama mərhələsindədir. Zəhmət olmasa admin ilə əlaqə saxlayın — sizin üçün abunəliyi əl ilə aktivləşdirə bilər.";
 
 export default function ParentSubscriptionPage() {
   const { appUser } = useAuth();
   const [loadingTier, setLoadingTier] = useState<PackageTier | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [subscription, setSubscription] = useState<SubscriptionDoc | null>(null);
+  const [checking, setChecking] = useState(true);
+
+  useEffect(() => {
+    if (!appUser) return;
+    getSubscription(appUser.uid).then((sub) => {
+      setSubscription(sub);
+      setChecking(false);
+    });
+  }, [appUser]);
 
   async function handleSubscribe(tier: PackageTier) {
     if (!appUser) return;
@@ -26,9 +40,33 @@ export default function ParentSubscriptionPage() {
       if (!res.ok) throw new Error(data.error ?? "Ödəniş başladıla bilmədi.");
       window.location.href = data.paymentUrl;
     } catch (err) {
-      setError((err as Error).message);
+      const msg = (err as Error).message;
+      setError(msg.includes("PAYRIFF_SECRET_KEY") ? FRIENDLY_ERROR : msg);
       setLoadingTier(null);
     }
+  }
+
+  if (checking) {
+    return <p className="text-sm text-slate-400">Yüklənir...</p>;
+  }
+
+  if (subscription?.status === "active") {
+    const pkg = PACKAGES.find((p) => p.tier === subscription.tier);
+    return (
+      <div>
+        <h1 className="text-2xl font-semibold text-slate-900">Abunəlik paketləri</h1>
+        <Card className="mt-6 max-w-md border-emerald-200 bg-emerald-50">
+          <p className="text-sm font-medium text-emerald-800">
+            ✓ Hazırda <strong>{pkg?.name ?? subscription.tier}</strong> paketiniz aktivdir.
+          </p>
+          {subscription.expiresAt && (
+            <p className="mt-1 text-xs text-emerald-700">
+              Etibarlılıq müddəti: {new Date(subscription.expiresAt).toLocaleDateString("az-AZ")}
+            </p>
+          )}
+        </Card>
+      </div>
+    );
   }
 
   return (
