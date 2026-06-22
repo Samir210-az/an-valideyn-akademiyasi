@@ -7,7 +7,15 @@ interface DashboardShellProps {
   sidebar: ReactNode;
   title: string;
   children: ReactNode;
+  /** Panelə görə fərqli isti ton (default: admin) */
+  accent?: "admin" | "parent" | "specialist";
 }
+
+const ACCENT_BG: Record<NonNullable<DashboardShellProps["accent"]>, string> = {
+  admin: "bg-gradient-to-br from-indigo-50 via-violet-50 to-rose-50",
+  parent: "bg-gradient-to-br from-orange-50 via-amber-50 to-indigo-50",
+  specialist: "bg-gradient-to-br from-emerald-50 via-teal-50 to-indigo-50",
+};
 
 async function handleLogout() {
   try {
@@ -22,14 +30,15 @@ async function handleLogout() {
  * Böyük ekranlarda (lg+) sidebar həmişə görünür. Mobil ekranlarda sidebar
  * "drawer" (yan pəncərə) kimi açılıb-bağlanır, content kənara çıxmır.
  * Çıxış düyməsi mobil üst paneldə HƏMIŞƏ görünür (menyu açmağa ehtiyac yoxdur).
+ * Fon hər panel üçün yumşaq, isti tonlu gradientdir — sadəcə ağ rəng yormasın deyə.
  */
-export function DashboardShell({ sidebar, title, children }: DashboardShellProps) {
+export function DashboardShell({ sidebar, title, children, accent = "admin" }: DashboardShellProps) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className={`min-h-screen ${ACCENT_BG[accent]}`}>
       {/* Mobil üst panel */}
-      <div className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 lg:hidden">
+      <div className="flex items-center justify-between border-b border-slate-200/70 bg-white/70 px-4 py-3 backdrop-blur-sm lg:hidden">
         <button
           onClick={() => setOpen(true)}
           aria-label="Menyu aç"

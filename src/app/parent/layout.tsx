@@ -6,7 +6,7 @@ import { ParentSidebar } from "@/components/parent/ParentSidebar";
 export default function ParentLayout({ children }: { children: ReactNode }) {
   return (
     <RoleGuard allowedRoles={["parent"]}>
-      <DashboardShell sidebar={<ParentSidebar />} title="Valideyn Paneli">
+      <DashboardShell sidebar={<ParentSidebar />} title="Valideyn Paneli" accent="parent">
         {children}
       </DashboardShell>
     </RoleGuard>

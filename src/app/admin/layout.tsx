@@ -6,7 +6,7 @@ import { AdminSidebar } from "@/components/admin/AdminSidebar";
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
     <RoleGuard allowedRoles={["admin"]}>
-      <DashboardShell sidebar={<AdminSidebar />} title="Admin Paneli">
+      <DashboardShell sidebar={<AdminSidebar />} title="Admin Paneli" accent="admin">
         {children}
       </DashboardShell>
     </RoleGuard>
