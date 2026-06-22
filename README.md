@@ -56,3 +56,5 @@ npm run dev
 ## Sənədlər
 - [Database arxitekturası](docs/database-architecture.md)
 - [Deployment təlimatı](docs/deployment.md)
+- [Test planı](docs/test-plan.md)
+- [Təhlükəsizlik planı](docs/security-plan.md)
