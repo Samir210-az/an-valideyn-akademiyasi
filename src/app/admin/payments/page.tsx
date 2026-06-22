@@ -13,7 +13,7 @@ export default function AdminPaymentsPage() {
     <div>
       <h1 className="text-2xl font-semibold text-slate-900">Ödənişlər və Paketlər</h1>
       <p className="mt-1 text-sm text-slate-500">
-        Abunəlik paketlərini idarə edin. Ödəniş provayderi inteqrasiyası (Stripe/yerli) növbəti mərhələdə qoşulacaq.
+        Abunəlik paketlərini idarə edin. Ödəniş Payriff (Azərbaycan ödəniş sistemi) ilə həyata keçirilir.
       </p>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">

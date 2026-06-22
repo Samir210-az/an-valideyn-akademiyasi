@@ -18,22 +18,18 @@ firebase init firestore   # mövcud layihəni seçin, firestore.rules-u override
 firebase deploy --only firestore:rules
 ```
 
-## 2. Stripe hesabı
-1. https://dashboard.stripe.com → hesab yaradın (Azərbaycan üçün Stripe birbaşa dəstəklənmirsə,
-   alternativ kimi yerli ödəniş provayderi — məs. Payriff, AzeriCard — inteqrasiya oluna bilər;
-   kod strukturu `src/lib/payments/` altında provayder-agnostikdir)
-2. **Products** → 3 məhsul yaradın: Basic (29 AZN/ay), Standard (49 AZN/ay), Premium (79 AZN/ay)
-   — hər biri üçün **recurring price** seçin
-3. Yaranan Price ID-ləri (`price_...`) `.env.local`-a yazın:
-   `STRIPE_PRICE_BASIC`, `STRIPE_PRICE_STANDARD`, `STRIPE_PRICE_PREMIUM`
-4. **Developers → API keys** → Secret key → `STRIPE_SECRET_KEY`
-5. **Developers → Webhooks** → Add endpoint:
-   `https://SİZİN-DOMENİNİZ.com/api/payments/webhook`
-   Events: `checkout.session.completed`, `customer.subscription.deleted`
-   → Signing secret → `STRIPE_WEBHOOK_SECRET`
+## 2. Payriff (Azərbaycan ödəniş sistemi)
+1. https://dashboard.payriff.com/auth?formType=signup → hesab yaradın → telefon nömrəsi ilə aktivləşdirin
+2. **Connect** səhifəsindən Merchant hesabı yaradın (Personal və ya Business — Business üçün
+   bank hesabı və VÖEN lazımdır)
+3. **Developers / Applications** bölməsindən **Merchant Secret Key**-i kopyalayın
+4. `.env.local`-a yazın: `PAYRIFF_SECRET_KEY=...`
+5. Test kartı ilə sınaqdan keçirin: Kart № `4000007546012078`, Tarix `04/29`, CVV `893`
+6. Production-a keçmək üçün müqaviləni imzalayıb tətbiqin statusunu "Online"-a çevirin
 
-## 3. OpenAI
-1. https://platform.openai.com/api-keys → yeni key yaradın → `OPENAI_API_KEY`
+## 3. Groq (AI funksiyaları)
+1. https://console.groq.com/keys → yeni API açar yaradın → `GROQ_API_KEY`
+   (pulsuz tier mövcuddur, Llama 3.3 70B modeli işlədilir)
 
 ## 4. Vercel-də deploy
 1. https://vercel.com → **Add New Project** → GitHub repo-nu seçin:
@@ -43,7 +39,7 @@ firebase deploy --only firestore:rules
    (xüsusilə `FIREBASE_SERVICE_ACCOUNT_KEY`-i JSON-u bir sətrə salıb yapıştırın)
 4. **Deploy** düyməsinə basın
 5. Deploy bitdikdə domeni `NEXT_PUBLIC_APP_URL` env dəyişəninə yazıb yenidən deploy edin
-   (Stripe success/cancel url-ləri üçün lazımdır)
+   (Payriff `callbackUrl` üçün lazımdır)
 
 ## 5. Domain qoşmaq (opsional)
 Vercel → Project → Settings → Domains → öz domeninizi (`an-akademiya.az` kimi) əlavə edin,
@@ -60,4 +56,5 @@ Qeydiyyat səhifəsi yalnız "valideyn" rolu yaradır (təhlükəsizlik üçün)
 ## 7. Buraxılışdan sonra
 - `firestore.rules`-u **mütləq** production-da yoxlayın (test mode-da hər kəs hər şeyi oxuyub yaza bilər)
 - Firebase Storage üçün də oxşar security rules yazılmalıdır (hazırda default)
-- Stripe-ı əvvəlcə **test mode**-da yoxlayın, sonra **live mode**-a keçin
+- Payriff-i əvvəlcə **test mode**-da yoxlayın (yuxarıdakı test kartı ilə), sonra müqaviləni
+  imzalayıb **production**-a keçin

@@ -38,11 +38,12 @@
 qəti tibbi ifadələrin olmadığını manual yoxlayın. Sistem promptu bunu qadağan edir, amma
 LLM nəticələri 100% deterministik olmadığından məhsuldan əvvəl nümunə cavablar nəzərdən keçirilməlidir.
 
-## 6. Ödəniş (Stripe)
-- Test mode-da checkout tamamlama → webhook `checkout.session.completed` → Firestore `subscriptions`
-  sənədi `status: active` ilə yaranır
-- Abunəliyi Stripe Dashboard-dan ləğv etmə → webhook `customer.subscription.deleted` →
-  Firestore-da `status: cancelled`
+## 6. Ödəniş (Payriff)
+- Test mode-da test kartı (`4000007546012078`) ilə ödəniş tamamlama → callback endpoint
+  `paymentStatus: "PAID"` qaytarır → Firestore `subscriptions` sənədi `status: active` ilə yaranır
+- Callback body-yə etibar edilmir — `getPayriffOrderInfo` ilə server-to-server status
+  yenidən soruşulur (saxta callback sorğularının qarşısını alır)
+- Ödəniş ləğv/imtina (`CANCELED`/`DECLINED`) → abunəlik **yaranmır**, valideyn yenidən cəhd edə bilər
 
 ## 7. Performans / Yüklənmə
 - Lighthouse ilə əsas səhifələrin (login, parent/dashboard) performans skoru ≥ 80

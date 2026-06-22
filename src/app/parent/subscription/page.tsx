@@ -17,14 +17,14 @@ export default function ParentSubscriptionPage() {
     setLoadingTier(tier);
     setError(null);
     try {
-      const res = await fetch("/api/payments/create-checkout-session", {
+      const res = await fetch("/api/payments/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ tier, parentId: appUser.uid, parentEmail: appUser.email }),
+        body: JSON.stringify({ tier, parentId: appUser.uid }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Ödəniş başladıla bilmədi.");
-      window.location.href = data.url;
+      window.location.href = data.paymentUrl;
     } catch (err) {
       setError((err as Error).message);
       setLoadingTier(null);

@@ -20,10 +20,11 @@
   (`request.resource.contentType.matches('video/.*')` kimi)
 
 ## 4. API Routes (server-side)
-- `OPENAI_API_KEY`, `STRIPE_SECRET_KEY`, `FIREBASE_SERVICE_ACCOUNT_KEY` yalnız server-side
+- `GROQ_API_KEY`, `PAYRIFF_SECRET_KEY`, `FIREBASE_SERVICE_ACCOUNT_KEY` yalnız server-side
   env dəyişənləridir (`NEXT_PUBLIC_` prefiksi YOXDUR) — brauzerə heç vaxt göndərilmir
-- Stripe webhook imza yoxlaması (`stripe.webhooks.constructEvent`) məcburidir — imzasız
-  sorğular rədd edilir, bu saxta ödəniş bildirişlərinin qarşısını alır
+- Payriff callback-i: gələn body-yə birbaşa etibar edilmir — `orderId` ilə Payriff-dən
+  rəsmi sifariş statusu server-to-server yenidən soruşulur (`getPayriffOrderInfo`).
+  Bu, saxta/manipulyasiya olunmuş callback sorğularının abunəlik aktivləşdirməsinin qarşısını alır
 
 ## 5. Məlumat Məxfiliyi (Uşaq Məlumatları — Həssas Kateqoriya)
 - Uşaqların diaqnoz, gündəlik davranış qeydləri kimi məlumatları **xüsusi həssas** sayılır:
