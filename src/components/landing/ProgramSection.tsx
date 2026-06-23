@@ -32,13 +32,23 @@ export function ProgramSection() {
   return (
     <section id="proqram" className="relative overflow-hidden bg-gradient-to-b from-indigo-50 via-violet-50 to-orange-50 px-4 py-20 sm:py-28">
       <div className="mx-auto max-w-6xl">
-        <Reveal className="mx-auto max-w-2xl text-center">
-          <span className="text-sm font-semibold uppercase tracking-wide text-indigo-600">Proqram</span>
-          <h2 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">12 həftə, real dəyişiklik</h2>
-          <p className="mt-4 text-slate-600">
-            Hər modul əvvəlkinin üzərində qurulur — qarmaşıq nəzəriyyə yox, evdə dərhal tətbiq edə biləcəyiniz addımlar.
-          </p>
-        </Reveal>
+        {/* Başlığın ötəsində light parallax şəkil */}
+        <div className="mb-12 grid gap-8 sm:grid-cols-2 lg:gap-12">
+          <div>
+            <Reveal className="mx-auto max-w-2xl text-left sm:text-left">
+              <span className="text-sm font-semibold uppercase tracking-wide text-indigo-600">Proqram</span>
+              <h2 className="mt-3 text-3xl font-bold text-slate-900 sm:text-4xl">12 həftə, real dəyişiklik</h2>
+              <p className="mt-4 text-slate-600">
+                Hər modul əvvəlkinin üzərində qurulur — qarmaşıq nəzəriyyə yox, evdə dərhal tətbiq edə biləcəyiniz addımlar.
+              </p>
+            </Reveal>
+          </div>
+          <Reveal delay={0.1}>
+            <div className="hidden h-64 overflow-hidden rounded-2xl sm:block lg:h-80">
+              <ParallaxImage src="/images/landing/gallery-1.jpg" alt="AN Akademiya — uşaqlar oyun zamanı" />
+            </div>
+          </Reveal>
+        </div>
 
         <div className="mt-14 grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
           {modules.map((m, i) => (
@@ -54,10 +64,7 @@ export function ProgramSection() {
           ))}
         </div>
 
-        <div className="mt-20 grid gap-6 sm:grid-cols-2">
-          <Reveal>
-            <ParallaxImage src="/images/landing/gallery-1.jpg" alt="AN Akademiya təlim otağı" />
-          </Reveal>
+        <div className="mt-20">
           <Reveal delay={0.15}>
             <ParallaxImage src="/images/landing/gallery-2.jpg" alt="Uşaqlar birgə oyun zamanı" />
           </Reveal>
