@@ -9,6 +9,7 @@
   "background_color": "#ffffff",
   "theme_color": "#FF6B35",
   "categories": ["education", "healthcare"],
+  "version": "2.0",
   "icons": [
     {
       "src": "/icon-192.png",
