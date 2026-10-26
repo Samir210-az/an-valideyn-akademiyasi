@@ -2,7 +2,7 @@
 // VACİB: AI heç vaxt diaqnoz qoymur, yalnız müşahidə əsaslı icmal/tövsiyə verir.
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const GROQ_MODEL = "llama-3.3-70b-versatile";
+const GROQ_MODEL = "openai/gpt-oss-120b";
 
 export const AI_SAFETY_PREAMBLE = `
 Sən "AN Valideyn Akademiyası" platformasının köməkçi AI analitikasısan.
@@ -36,7 +36,8 @@ export async function callOpenAI(messages: ChatMessage[]): Promise<string> {
       model: GROQ_MODEL,
       messages,
       temperature: 0.4,
-      max_tokens: 700,
+      max_tokens: 1500,
+      reasoning_effort: "low",
     }),
   });
 
