@@ -25,14 +25,14 @@ export function Footer() {
         <p>© {new Date().getFullYear()} AN Valideyn Akademiyası. Bütün hüquqlar qorunur.</p>
         <div className="flex items-center gap-4">
           <a
-            href="https://instagram.com/s_akhundoff"
+            href="https://aze-ai.az"
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 hover:text-foreground transition-colors font-medium"
             aria-label="Instagram"
           >
             <InstagramIcon />
-            <span>@s_akhundoff</span>
+            <span>securtiy_group</span>
           </a>
         </div>
       </div>
