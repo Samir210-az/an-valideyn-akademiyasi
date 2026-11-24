@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPayriffOrderInfo } from "@/lib/payments/payriff-client";
 import { getAdminDb } from "@/lib/firebase/admin";
+import { SITE_URL, field, sendTelegram } from "@/lib/telegram";
 
 /**
  * Payriff ödəniş tamamlandıqdan sonra bu endpoint-ə POST sorğusu göndərir.
@@ -40,6 +41,19 @@ export async function POST(req: NextRequest) {
         },
         { merge: true }
       );
+
+      try {
+        const parent = await db.collection("users").doc(parentId).get();
+        await sendTelegram(
+          "💳 Yeni ödəniş — AN Valideyn Akademiyası\n" +
+            field("Valideyn", parent.data()?.fullName) +
+            field("Paket", tier) +
+            field("Bitmə tarixi", expiresAt.toLocaleDateString("az-AZ")) +
+            `Link: ${SITE_URL}`
+        );
+      } catch {
+        // bildiriş xətası abunəliyin aktivləşməsinə mane olmamalıdır
+      }
     }
 
     return NextResponse.json({ received: true });

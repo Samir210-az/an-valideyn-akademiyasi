@@ -37,6 +37,12 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await registerUser({ email, password, fullName, role: "parent", phone });
+      fetch("/api/notify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName, email, phone }),
+        keepalive: true,
+      }).catch(() => {});
       router.push("/parent/dashboard");
     } catch (err) {
       setError(mapAuthError(err));
